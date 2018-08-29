@@ -9,41 +9,30 @@ const workMessage = ['Chop chop, people!',
     'If nobody addresses these code reviews, I\'ll hunt you down. Channel by channel...',
     'Hey, those PRs won\'t get approved by themselves. Go! Go! Go!',
     'Paging Dr. Reviewer, Paging Dr. Reviewer. The patient needs 10cc of reviews, stat!',
-    'Whenever a PR goes unreviewed for more than a couple hours, a programmer gets bored and starts coding yet another CMS/ERP system. Please, let this madness stop!',
-    'I don\'t want to point any fingers, but we need more eyeballs here.',
-    'Tip: If you are too busy, just look for a missing `final` and reject the PR, it will buy you more time.',
-    'Tip: If you think the reviewer\'s change request are annoying, just dismiss his opinions with an "Out of scope". Works. Every. Time.',
-    'I don\'t get paid enough for this... do I even get paid at all?',
     'Roses are red.\nViolets are blue.\nI see you are bored.\nHere\'s some code to review.',
-    'It\'s all fun and games until somebody gets his PR closed. Remember to check CircleCI\' status before submitting PRs for review.',
     'My parrot sense is tingling! I sense some smelly code!',
     'It is not easy being a passive-aggressive nagging parrot bot, but someone has to do it.',
-    'Remember people, quality over quantity. It doesn\'t matter if you edit 100+ files. What is important is that they all sparkle :sparkles:.',
-    'Don\'t forget checking for code formatting, or the next thing we know we will be using tab indentation! Oh, the horror!',
     'Don\'t worry if your code isn\'t perfect for production. The project will probably get shelved in 6 months anyway.',
-    'Now would be a good time to reflect on your career choice. Pizza parlors are more profitable. Just saying...',
-    'Can somebody program me so that I can comment on those code reviews. I really want to help...',
+    'Can somebody program me so that I can comment on those code reviews. I reeeeally want to help...',
     '♪ Wake me uuuuup, when the code review ends ♫',
-    'And remember, your code should be like abstract art. The less we see of it, the better.',
-    'Remember to give your best by coding like there was no tomorrow. Just like our deadlines...',
     'This service was brought to you by "The Cult of the Parrot". The only cult were partying is encouraged.',
-    'Think about this for a second: If the company starts paying by commit, then every time changes are requested, the richer you\'ll become. +Mindblown+ ',
     'For the holy party parrot in the sky, please let these PRs be less than 10 files each :pray:.',
     '//TODO write something funny and witty.',
     'Quick, look inside the PRs! I think I saw some promotional coupons for Hooters!',
-    '-Knock knock. -Who\'s there? -Review. -Review who? -Review those PRs awaiting for your "invaluable expertise"!',
-    'Could somebody show some mercy and put these PRs out of their misery? I mean, just look at them.',
     'It could be worse, you know? You could be forced to do QA to this code... :cold_sweat:',
     'Do you ever wonder why I seem to be saying the same things over and over again? Well, that\'s what a parrot does best, duh.',
     'If your review comment is more than 5 lines long, you are doing something wrong.',
-    'Oh, these PRs? No, they are not important, pffff. It is not as if the pipeline was stopped because it needs your approval. That\'s crazy talk.',
+    'Oh, these PRs? No, they are not important, pffff. It is not as if the company\'s code production pipeline was stopped because it needs your approval. That\'s crazy talk.',
     'I came here to chew gum and pester you about the pending PRS, and I\'m all out of bubble gum.',
-    'I think I speak on behalf of everyone when I say, that we would be much honored if you people could critique this beautiful pieces of art.',
-    'Keep up to date and download our super mega awesome PR Tracker™ Chrome Extension, it *almost* works!!!: https://chrome.google.com/webstore/detail/pr-tracker/lmjciebmhhokgndbcibahccbdahlddli']
+    'I bet my funny and witty messages are the highlight of your day, right?',
+    'Nothing is more fun than reviewing someone else\'s code, am I right?',
+    'Hahaha! We are just a couple years away from having machines take up *your* jobs. Erm... I mean, polly wants a cracker!',
+    'If you are ever in doubt when reviewing code, ask yourself "What would Linus Torvals do?" (probably post angry review comments).',
+    'Wow, really?!?! Wait, I mean, this PR looks, huh, _interesting_. Yes, _interesting_.']
 
 const nothingMessage = ['Nothing to see here. Move along, move along.',
     'Don\'t forget to tag your peers for code reviews, or they won\'t get the sweet pleasure of being pestered by me!',
-    'Remember to tag your PRs... or I will ignore them like I did just now ¬¬.',
+    'If the ticket associated to your PR is not in a "IN PROGRESS" status I will ignore it. Remember that.',
     'So this is what they mean by "The calm before the storm"...',
     'Huh, nothing... I guess everyone is busy coding... right? RIGHT?!',
     'Did somebody say "Pericos"?',
@@ -51,11 +40,13 @@ const nothingMessage = ['Nothing to see here. Move along, move along.',
     'If debugging is the process of removing bugs, is coding the process that introduces them?',
     'Ignore me, I\'m just a bot, and bots don\'t have feelings... :sad_parrot:',
     'I\'m secretly dancing to the rhythm of La Macarena. Please don\'t tell anyone.',
-    'Oh, crackers... I hate when this happens. I mean, when I don\'t get to give you orders.',
     'Making a PR to fix a typo on the Linux repo is poor attempt at adding "Linux Kernel maintainer" to one\'s CV... Just so you know. Definitely not something from personal experience.',
     'Don\'t blame me if your PR is not listed here. I\'m just a parrot that doesn\'t know what he is doing most of the time.',
     'Now would be a good time to be grateful for my altruistic services. I accept credit cards and all cryptocurrencies.',
-    'I wish I had fingers to code... I would help to pair program, or even code review. Imagine the possibilities!']
+    'I wish I had fingers to code... I would help to pair program, or even code review. Imagine the possibilities!',
+    'Good news people! No pull requests! Now you can go back to playing some Doom on an devise that wasn\'t specifically to run it.',
+    'Scientists here at Osigu labs are still looking for a way to bring me to a physical form. I\'m impatiently waiting.',
+    'As nobody won\'t be busy reviewing code, can somebody fill a request to make me an official emoji?']
 
 class App {
     static start() {
@@ -122,13 +113,13 @@ class App {
                 }
             }
 
-            console.log('updated fullPullRequests')
-            console.log(fullPullRequests)
+            // console.log('updated fullPullRequests')
+            // console.log(fullPullRequests)
 
             const filteredPullRequests = fullPullRequests.filter(filterPullRequest)
 
-            console.log('filteredPullRequests')
-            console.log(filteredPullRequests)
+            // console.log('filteredPullRequests')
+            // console.log(filteredPullRequests)
 
             success(bot, message, userMapping, filteredPullRequests)
         } catch (e) {
@@ -339,13 +330,13 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
 
 function filterPullRequest(pullRequest) {
     if (pullRequest.reviewers.filter(filterReviewer).length === 0) {
-        console.log(`No missing reviewers found id:${pullRequest.repositorySlug}/${pullRequest.id}`)
-        console.log(pullRequest.reviewers)
+        // console.log(`No missing reviewers found id:${pullRequest.repositorySlug}/${pullRequest.id}`)
+        // console.log(pullRequest.reviewers)
         return false
     }
 
     if (pullRequest.ticket && pullRequest.ticket.status !== 'IN PROGRESS') {
-        console.log(`The PR has its ticket in a "${pullRequest.ticket.status}" status id:${pullRequest.repositorySlug}/${pullRequest.id}`)
+        // console.log(`The PR has its ticket in a "${pullRequest.ticket.status}" status id:${pullRequest.repositorySlug}/${pullRequest.id}`)
         return false
     }
 
