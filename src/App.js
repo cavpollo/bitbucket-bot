@@ -86,6 +86,7 @@ class App {
 
             const repositories = await getRepositories(bitbucketOrganization, accessToken)
 
+            console.log('repositories')
             console.log(repositories)
 
             const simplePullRequests = []
@@ -95,6 +96,7 @@ class App {
                 simplePullRequests.concat(pullRequestsData)
             }
 
+            console.log('simplePullRequests')
             console.log(simplePullRequests)
 
             const fullPullRequests = []
@@ -104,6 +106,7 @@ class App {
                 fullPullRequests.concat(pullRequestData)
             }
 
+            console.log('fullPullRequests')
             console.log(fullPullRequests)
 
             for (let i = 0, pullRequest; pullRequest = simplePullRequests[i]; i++) {
@@ -114,6 +117,7 @@ class App {
                 fullPullRequests.ticket = ticketData
             }
 
+            console.log('updated fullPullRequests')
             console.log(fullPullRequests)
 
             success(bot, message, userMapping, fullPullRequests)
@@ -203,7 +207,7 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
 }
 
 function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, page = 1) {
-    console.log('start getPullRequests page:' + page)
+    console.log(`start getPullRequests repo:${repositorySlug} page:${page}`)
 
     const options = {
         method: 'GET',
@@ -235,7 +239,7 @@ function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, pag
                 pullRequests.push(prData)
             }
 
-            console.log('pullRequests page:' + page)
+            console.log(`getPullRequests repo:${repositorySlug} page:${page}`)
             console.log(pullRequests)
 
             if (jsonResponse.next) {
@@ -247,7 +251,7 @@ function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, pag
             return pullRequests
         })
         .catch(function (err) {
-            console.error(`getPullRequests page:${page} failed`)
+            console.error(`getPullRequests repo:${repositorySlug} page:${page} failed`)
             throw err
         })
 }
