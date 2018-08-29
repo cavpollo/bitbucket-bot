@@ -140,7 +140,7 @@ function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': `Basic ${encodeBase64(bitbucketUsername + ':' + bitbucketToken)}`
         },
-        body: {
+        form: {
             'grant_type': 'client_credentials'
         },
         json: true
@@ -152,7 +152,7 @@ function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
         })
         .catch(function (err) {
             console.error('authenticateBitbucket failed')
-            throw err;
+            throw err
         })
 }
 
