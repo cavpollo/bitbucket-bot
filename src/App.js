@@ -27,7 +27,7 @@ const workMessage = ['Chop chop, people!',
     'I bet my funny and witty messages are the highlight of your day, right?',
     'Nothing is more fun than reviewing someone else\'s code, am I right?',
     'Hahaha! We are just a couple years away from having machines take up *your* jobs. Erm... I mean, polly wants a cracker!',
-    'If you are ever in doubt when reviewing code, ask yourself "What would Linus Torvals do?" (probably post angry review comments).',
+    'If you are ever in doubt when reviewing code, ask yourself "What would Linus Torvalds do?" Well, probably post angry review comments, but you get the idea.',
     'Wow, really?!?! Wait, I mean, this PR looks, huh, _interesting_. Yes, _interesting_.']
 
 const nothingMessage = ['Nothing to see here. Move along, move along.',
