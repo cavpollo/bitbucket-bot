@@ -125,7 +125,7 @@ class App {
             console.log('updated fullPullRequests')
             console.log(fullPullRequests)
 
-            const filteredPullRequests = fullPullRequests.filter(filterPullRequest()
+            const filteredPullRequests = fullPullRequests.filter(filterPullRequest)
 
             success(bot, message, userMapping, filteredPullRequests)
         } catch (e) {
