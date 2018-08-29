@@ -125,7 +125,9 @@ class App {
             console.log('updated fullPullRequests')
             console.log(fullPullRequests)
 
-            success(bot, message, userMapping, fullPullRequests)
+            const filteredPullRequests = fullPullRequests.filter(filterPullRequest()
+
+            success(bot, message, userMapping, filteredPullRequests)
         } catch (e) {
             console.error(e.message)
 
@@ -337,6 +339,22 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
         })
 }
 
+function filterPullRequest(pullRequest) {
+    if (pullRequest.reviewers.filter(filterReviewer).length === 0) {
+        return false
+    }
+
+    if (pullRequest.ticket && pullRequest.ticket.status !== 'IN PROGRESS') {
+        return false
+    }
+
+    return true
+}
+
+function filterReviewer(reviewer) {
+    return reviewer.approved && reviewer.type === 'REVIEWER'
+}
+
 function success(bot, message, userMapping, pullRequests) {
     var botMessage
 
@@ -355,7 +373,7 @@ function success(bot, message, userMapping, pullRequests) {
 
 function formatPullRequest(pullRequest, userMapping) {
     // ${pullRequest.critical ? ':rotating_light:' : ''}
-    return `\`${pullRequest.title}\` ${pullRequest.reviewers ? pullRequest.reviewers.map(r => formatReviewers(r, userMapping)).join(' ') : ''} - ${formatUrl(pullRequest.link)}`
+    return `\`${pullRequest.title}\` ${pullRequest.reviewers ? pullRequest.reviewers.filter(filterReviewer).map(r => formatReviewers(r, userMapping)).join(' ') : ''} - ${formatUrl(pullRequest.link)}`
 }
 
 function formatReviewers(reviewer, userMapping) {
