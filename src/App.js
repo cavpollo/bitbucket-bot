@@ -176,9 +176,6 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
 
     return requestPromise(options)
         .then(async function (jsonResponse) {
-            console.log('jsonResponse')
-            console.log(jsonResponse)
-
             const repositories = []
             for (var i = 0, repository; repository = jsonResponse.values[i]; i++) {
                 // Get the repositories that are marked as services?
@@ -191,16 +188,14 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
                 repositories.push(repoData)
             }
 
-            console.log('repositories')
-            console.log(repositories)
-
             if (jsonResponse.next) {
                 const moreRepositories = await getRepositories(bitbucketOrganization, accessToken, page + 1)
+
+                console.log('moreRepositories:')
+                console.log(moreRepositories)
+
                 repositories.concat(moreRepositories)
             }
-
-            console.log('repositories concat')
-            console.log(repositories)
 
             return repositories
         })
