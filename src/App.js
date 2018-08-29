@@ -118,7 +118,7 @@ class App {
 
             success(bot, message, userMapping, fullPullRequests)
         } catch (e) {
-            console.error(e)
+            console.error(e.message)
 
             bot.reply({channel: message.channel}, {'text': 'Error, something went wrong and I don\'t know how to fix it... I\'m just a parrot :sad_parrot:'})
         }
@@ -137,7 +137,7 @@ function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
         uri: 'https://bitbucket.org/site/oauth2/access_token',
         headers: {
             'User-Agent': 'Request-Promise',
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': `Basic ${encodeBase64(bitbucketUsername + ':' + bitbucketToken)}`
         },
         body: {
