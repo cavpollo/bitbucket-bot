@@ -60,10 +60,12 @@ class App {
     static start() {
         const controller = new SlackBot().getController()
 
-        controller.hears("pester (.+)", ["direct_message", "direct_mention", "mention"], this.pester)
+        controller.hears("pester", ["direct_message", "direct_mention", "mention"], this.pester)
     }
 
     static pester(bot, message) {
+        console.log("Pester heard!")
+
         let bitbucketUsername = process.env.BITBUCKET_USER
         let bitbucketToken = process.env.BITBUCKET_TOKEN
         let bitbucketOrganization = process.env.BITBUCKET_ORG
@@ -73,6 +75,8 @@ class App {
         let jiraOrganization = process.env.JIRA_ORG
 
         let userMapping = JSON.parse(process.env.USER_MAPPING || '{}')
+
+        console.log("userMapping: " + userMapping)
 
         try {
             let authCode = authenticateBitbucket(bitbucketUsername, bitbucketToken)

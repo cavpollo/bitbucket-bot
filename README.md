@@ -16,8 +16,12 @@ In your Slack room, just call the bot.
 Also, you'll need to configure the following variables in your Heroku environment:
 
 ```
-GITHUB_AUTH_TOKEN=987fed
-SLACK_BOT_TOKEN=123456
+BITBUCKET_USER=abc123
+BITBUCKET_TOKEN=def456
+BITBUCKET_ORG=awesomeorg
+JIRA_USER=abc123
+JIRA_TOKEN=def456
+JIRA_ORG=awesomeorg
 USER_MAPPING={"githubUsername":"slackUserId"}
 ```
 
