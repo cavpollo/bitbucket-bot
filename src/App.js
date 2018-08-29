@@ -77,17 +77,17 @@ class App {
 
         let userMapping = JSON.parse(process.env.USER_MAPPING || '{}')
 
-        console.log('userMapping: ' + userMapping)
+        // console.log('userMapping: ' + userMapping)
 
         try {
             const accessToken = await authenticateBitbucket(bitbucketUsername, bitbucketToken)
 
-            console.log('accessToken: ' + accessToken)
+            // console.log('accessToken: ' + accessToken)
 
             const repositories = await getRepositories(bitbucketOrganization, accessToken)
 
-            console.log('repositories')
-            console.log(repositories)
+            // console.log('repositories')
+            // console.log(repositories)
 
             let simplePullRequests = []
             for (let i = 0, repository; repository = repositories[i]; i++) {
@@ -96,8 +96,8 @@ class App {
                 simplePullRequests = simplePullRequests.concat(pullRequestsData)
             }
 
-            console.log('simplePullRequests')
-            console.log(simplePullRequests)
+            // console.log('simplePullRequests')
+            // console.log(simplePullRequests)
 
             let fullPullRequests = []
             for (let i = 0, pullRequest; pullRequest = simplePullRequests[i]; i++) {
@@ -106,8 +106,8 @@ class App {
                 fullPullRequests = fullPullRequests.concat(pullRequestData)
             }
 
-            console.log('fullPullRequests')
-            console.log(fullPullRequests)
+            // console.log('fullPullRequests')
+            // console.log(fullPullRequests)
 
             for (let i = 0, pullRequest; pullRequest = simplePullRequests[i]; i++) {
                 const ticketId = /DEV-\d+/.exec(pullRequest.title)
@@ -118,7 +118,7 @@ class App {
 
                     fullPullRequests.ticket = ticketData
                 } else {
-                    console.error(`PR ${pullRequest.repositorySlug}/${pullRequest.id} has no ticket in title ${pullRequest.title}`)
+                    console.error(`PR ${pullRequest.repositorySlug}/${pullRequest.id} has no ticket in title "${pullRequest.title}"`)
                 }
             }
 
@@ -126,6 +126,9 @@ class App {
             console.log(fullPullRequests)
 
             const filteredPullRequests = fullPullRequests.filter(filterPullRequest)
+
+            console.log('filteredPullRequests')
+            console.log(filteredPullRequests)
 
             success(bot, message, userMapping, filteredPullRequests)
         } catch (e) {
@@ -327,7 +330,7 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
         .then(async function (jsonResponse) {
             // Only "IN PROGRESS" and by team?
             const ticketData = {
-                team: jsonResponse.fields.customfield_10900,
+                team: jsonResponse.fields.customfield_10900.value,
                 status: jsonResponse.fields.status.name,
             }
 
@@ -341,10 +344,13 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
 
 function filterPullRequest(pullRequest) {
     if (pullRequest.reviewers.filter(filterReviewer).length === 0) {
+        console.log(`No valid reviewers found id:${pullRequest.repositorySlug}/${pullRequest.id}`)
+        console.log(pullRequest.reviewers)
         return false
     }
 
     if (pullRequest.ticket && pullRequest.ticket.status !== 'IN PROGRESS') {
+        console.log(`The PR has its ticket in a "${pullRequest.ticket.status}" status id:${pullRequest.repositorySlug}/${pullRequest.id}`)
         return false
     }
 
