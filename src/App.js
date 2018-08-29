@@ -136,7 +136,6 @@ function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
         headers: {
             'User-Agent': 'Request-Promise',
             'Content-Type': 'application/json',
-            'grant_type': 'client_credentials',
             'Authorization': `Basic ${encodeBase64(bitbucketUsername + ':' + bitbucketToken)}`
         },
         json: true
