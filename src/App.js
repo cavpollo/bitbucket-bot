@@ -60,10 +60,10 @@ class App {
     static start() {
         const controller = new SlackBot().getController()
 
-        controller.hears("ls (.+)", ["direct_message", "direct_mention", "mention"], this.ls)
+        controller.hears("pester (.+)", ["direct_message", "direct_mention", "mention"], this.pester)
     }
 
-    static ls(bot, message) {
+    static pester(bot, message) {
         let bitbucketUsername = process.env.BITBUCKET_USER
         let bitbucketToken = process.env.BITBUCKET_TOKEN
         let bitbucketOrganization = process.env.BITBUCKET_ORG
