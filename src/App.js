@@ -125,6 +125,10 @@ class App {
     }
 }
 
+function encodeBase64(string) {
+    return Buffer.from(string).toString('base64')
+}
+
 function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
     const options = {
         method: 'POST',
@@ -133,7 +137,7 @@ function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
             'User-Agent': 'Request-Promise',
             'Content-Type': 'application/json',
             'grant_type': 'client_credentials',
-            'Authorization': `Basic ${Base64.encode(bitbucketUsername + ':' + bitbucketToken)}`
+            'Authorization': `Basic ${encodeBase64(bitbucketUsername + ':' + bitbucketToken)}`
         },
         json: true
     }
@@ -287,7 +291,7 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
         headers: {
             'User-Agent': 'Request-Promise',
             'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + Base64.encode(jiraUsername + ":" + jiraToken)
+            'Authorization': 'Basic ' + encodeBase64(jiraUsername + ":" + jiraToken)
         },
         json: true
     }
