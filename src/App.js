@@ -130,6 +130,8 @@ function encodeBase64(string) {
 }
 
 function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
+    console.log('start authenticateBitbucket')
+
     const options = {
         method: 'POST',
         uri: 'https://bitbucket.org/site/oauth2/access_token',
@@ -155,11 +157,14 @@ function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
 }
 
 function getRepositories(bitbucketOrganization, accessToken, page = 1) {
+    console.log('start getRepositories')
+
     const options = {
         method: 'GET',
         uri: 'https://api.bitbucket.org/2.0/repositories/' + bitbucketOrganization,
         qs: {
-            page: page
+            page: page,
+            pagelen: 25
         },
         headers: {
             'User-Agent': 'Request-Promise',
@@ -197,11 +202,14 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
 }
 
 function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, page = 1) {
+    console.log('start getPullRequests')
+
     const options = {
         method: 'GET',
         uri: `https://api.bitbucket.org/2.0/repositories/${bitbucketOrganization}/${repositorySlug}/pullrequests`,
         qs: {
-            page: page
+            page: page,
+            pagelen: 25
         },
         headers: {
             'User-Agent': 'Request-Promise',
@@ -240,6 +248,8 @@ function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, pag
 }
 
 function getPullRequest(bitbucketOrganization, repositorySlug, id, accessToken) {
+    console.log('start getPullRequest')
+
     const options = {
         method: 'GET',
         uri: `https://api.bitbucket.org/2.0/repositories/${bitbucketOrganization}/${repositorySlug}/pullrequests/${id}`,
@@ -287,6 +297,8 @@ function getPullRequest(bitbucketOrganization, repositorySlug, id, accessToken) 
 }
 
 function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
+    console.log('start getTicket')
+
     const options = {
         method: 'GET',
         uri: `https://${jiraOrganization}.atlassian.net/rest/api/latest/issue/${ticketId}`,
