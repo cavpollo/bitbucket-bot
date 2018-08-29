@@ -195,8 +195,13 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
             if (jsonResponse.next) {
                 const moreRepositories = await getRepositories(bitbucketOrganization, accessToken, page + 1)
 
+                console.log('concat getRepositories page:' + page)
+
                 repositories.concat(moreRepositories)
             }
+
+
+            console.log('return getRepositories page:' + page)
 
             return repositories
         })
