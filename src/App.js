@@ -379,7 +379,7 @@ function getRandomMessage(messages) {
 }
 
 function formatUrl(html_url) {
-    const regexp = new RegExp(`\\/([^\\/]+)\\/pull\\/(\\d+)$`)
+    const regexp = new RegExp(`\\/([^\\/]+)\\/pull-requests\\/(\\d+)$`)
 
     const matched = html_url.match(regexp)
 
