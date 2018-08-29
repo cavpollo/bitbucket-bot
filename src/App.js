@@ -198,7 +198,7 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
         })
         .catch(function (err) {
             console.error(`getRepositories page:${page} failed`)
-            throw err;
+            throw err
         })
 }
 
@@ -247,8 +247,8 @@ function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, pag
             return pullRequests
         })
         .catch(function (err) {
-            console.error('getPullRequests page:${page} failed`)
-            throw err;
+            console.error(`getPullRequests page:${page} failed`)
+            throw err
         })
 }
 
@@ -297,7 +297,7 @@ function getPullRequest(bitbucketOrganization, repositorySlug, id, accessToken) 
         })
         .catch(function (err) {
             console.error('getPullRequest failed')
-            throw err;
+            throw err
         })
 }
 
@@ -327,7 +327,7 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
         })
         .catch(function (err) {
             console.error('getTicket failed')
-            throw err;
+            throw err
         })
 }
 
