@@ -200,8 +200,7 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
                 repositories.concat(moreRepositories)
             }
 
-
-            console.log('return getRepositories page:' + page)
+            console.log(`return getRepositories page:${page} item-count:${repositories.length}`)
 
             return repositories
         })
