@@ -1,8 +1,8 @@
-# Quinela Party Parrot as a Service
+# Bitbucket Review Reminder Party Parrot as a Service
 
 ## What's this?
 
-A semi-terrible attempt at making a bot that posts pull request reminders on a slack channel. Don't ask.
+A semi-terrible attempt at making a bot that posts pull request reminders on a slack channel.
 
 ## Usage
 
@@ -22,7 +22,7 @@ BITBUCKET_ORG=awesomeorg
 JIRA_USER=abc123
 JIRA_TOKEN=def456
 JIRA_ORG=awesomeorg
-USER_MAPPING={"githubUsername":"slackUserId"}
+USER_MAPPING={"bitbucketUsername":"slackUserId"}
 ```
 
 ### Tips

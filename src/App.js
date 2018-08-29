@@ -1,6 +1,7 @@
 'use strict'
 
 const SlackBot = require('./SlackBot')
+const requestPromise = require('request-promise')
 
 const workMessage = ['Chop chop, people!',
     'Ha! And you thought your day couldn\'t get any more boring...',
@@ -63,7 +64,7 @@ class App {
         controller.hears("pester", ["direct_message", "direct_mention", "mention"], this.pester)
     }
 
-    static pester(bot, message) {
+    static async pester(bot, message) {
         console.log("Pester heard!")
 
         let bitbucketUsername = process.env.BITBUCKET_USER
@@ -76,29 +77,29 @@ class App {
 
         let userMapping = JSON.parse(process.env.USER_MAPPING || '{}')
 
-        console.log("userMapping: " + userMapping)
+        console.log('userMapping: ' + userMapping)
 
         try {
-            let authCode = authenticateBitbucket(bitbucketUsername, bitbucketToken)
+            const accessToken = await authenticateBitbucket(bitbucketUsername, bitbucketToken)
 
-            console.log(authCode)
+            console.log('accessToken: ' + accessToken)
 
-            let repositories = getRepositories(bitbucketOrganization, authCode)
+            const repositories = await getRepositories(bitbucketOrganization, accessToken)
 
             console.log(repositories)
 
-            let simplePullRequests = []
+            const simplePullRequests = []
             for (let i = 0, repository; repository = repositories[i]; i++) {
-                let pullRequestsData = getPullRequests(bitbucketOrganization, repository.slug)
+                const pullRequestsData = await getPullRequests(bitbucketOrganization, repository.slug, accessToken)
 
                 simplePullRequests.push(pullRequestsData)
             }
 
             console.log(simplePullRequests)
 
-            let fullPullRequests = []
+            const fullPullRequests = []
             for (let i = 0, pullRequest; pullRequest = simplePullRequests[i]; i++) {
-                let pullRequestData = getPullRequest(bitbucketOrganization, pullRequest.repositorySlug, pullRequest.id, authCode)
+                const pullRequestData = await getPullRequest(bitbucketOrganization, pullRequest.repositorySlug, pullRequest.id, accessToken)
 
                 fullPullRequests.push(pullRequestData)
             }
@@ -106,9 +107,9 @@ class App {
             console.log(fullPullRequests)
 
             for (let i = 0, pullRequest; pullRequest = simplePullRequests[i]; i++) {
-                let ticketId = /DEV-\d+/.exec(pullRequest.title)
+                const ticketId = /DEV-\d+/.exec(pullRequest.title)
                 // if ticket id present
-                let ticketData = getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId)
+                const ticketData = await getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId)
 
                 fullPullRequests.ticket = ticketData
             }
@@ -125,185 +126,186 @@ class App {
 }
 
 function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
-    let xmlHttp = new XMLHttpRequest()
-    let url = "https://bitbucket.org/site/oauth2/access_token"
-
-    xmlHttp.open("POST", url, false)
-    xmlHttp.setRequestHeader('Content-Type', 'application/json')
-    xmlHttp.setRequestHeader('grant_type', 'client_credentials')
-    xmlHttp.setRequestHeader('Authorization', 'Basic ' + Base64.encode(bitbucketUsername + ":" + bitbucketToken))
-    let response = xmlHttp.send()
-
-    if (response.status === 200) {
-        let jsonResponse = JSON.parse(response.responseText)
-        return jsonResponse.access_token
+    const options = {
+        method: 'POST',
+        uri: 'https://bitbucket.org/site/oauth2/access_token',
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'Content-Type': 'application/json',
+            'grant_type': 'client_credentials',
+            'Authorization': `Basic ${Base64.encode(bitbucketUsername + ':' + bitbucketToken)}`
+        },
+        json: true
     }
 
-    console.error(response)
-
-    return undefined
+    return requestPromise(options)
+        .then(function (jsonResponse) {
+            return jsonResponse.access_token
+        })
+        .catch(function (err) {
+            console.error('authenticateBitbucket failed')
+            throw err;
+        })
 }
 
-function getRepositories(bitbucketOrganization, authToken, page, repositories) {
-    let xmlHttp = new XMLHttpRequest()
-
-    if (page === undefined) {
-        page = 1
+function getRepositories(bitbucketOrganization, accessToken, page = 1) {
+    const options = {
+        method: 'GET',
+        uri: 'https://api.bitbucket.org/2.0/repositories/' + bitbucketOrganization,
+        qs: {
+            page: page
+        },
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + accessToken
+        },
+        json: true
     }
 
-    let url = "https://api.bitbucket.org/2.0/repositories/" + bitbucketOrganization + "/?page=" + page
-
-    xmlHttp.open("GET", url, false)
-    xmlHttp.setRequestHeader('Content-Type', 'application/json')
-    xmlHttp.setRequestHeader('Authorization', 'Bearer ' + authToken)
-    let response = xmlHttp.send()
-
-    if (response.status === 200) {
-        let jsonResponse = JSON.parse(response.responseText)
-
-        if (repositories === undefined) {
-            repositories = []
-        }
-
-        for (var i = 0, repository; repository = jsonResponse.values[i]; i++) {
-            // Get the repositories that are marked as services?
-            let repoData = {
-                uuid: repository.uuid,
-                slug: repository.slug,
-                name: repository.name,
-                type: repository.type,
+    return requestPromise(options)
+        .then(async function (jsonResponse) {
+            const repositories = []
+            for (var i = 0, repository; repository = jsonResponse.values[i]; i++) {
+                // Get the repositories that are marked as services?
+                let repoData = {
+                    uuid: repository.uuid,
+                    slug: repository.slug,
+                    name: repository.name,
+                    type: repository.type,
+                }
+                repositories.push(repoData)
             }
-            repositories.push(repoData)
-        }
 
-        if (jsonResponse.next) {
-            return getRepositories(bitbucketOrganization, authToken, page + 1, repositories)
-        }
+            if (jsonResponse.next) {
+                const moreRepositories = await getRepositories(bitbucketOrganization, accessToken, page + 1)
+                repositories.concat(moreRepositories)
+            }
 
-        return repositories
-    }
-
-    console.error(response)
-
-    return undefined
+            return repositories
+        })
+        .catch(function (err) {
+            console.error('getRepositories failed')
+            throw err;
+        })
 }
 
-function getPullRequests(bitbucketOrganization, repositorySlug, authToken, page, pullRequests) {
-    let xmlHttp = new XMLHttpRequest()
-
-    if (page === undefined) {
-        page = 1
+function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, page = 1) {
+    const options = {
+        method: 'GET',
+        uri: `https://api.bitbucket.org/2.0/repositories/${bitbucketOrganization}/${repositorySlug}/pullrequests`,
+        qs: {
+            page: page
+        },
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + accessToken
+        },
+        json: true
     }
 
-    let url = "https://api.bitbucket.org/2.0/repositories/" + bitbucketOrganization + "/" + repositorySlug +"/pullrequests/?page=" + page
+    return requestPromise(options)
+        .then(async function (jsonResponse) {
+            const pullRequests = []
+            for (var i = 0, pullRequest; pullRequest = jsonResponse.values[i]; i++) {
+                // ??
+                let prData = {
+                    id: pullRequest.id,
+                    repositorySlug: repositorySlug,
+                    title: pullRequest.title,
+                    state: pullRequest.state,
+                    link: pullRequest.links.html.href,
+                }
+                pullRequests.push(prData)
+            }
 
-    xmlHttp.open("GET", url, false)
-    xmlHttp.setRequestHeader('Content-Type', 'application/json')
-    xmlHttp.setRequestHeader('Authorization', 'Bearer ' + authToken)
-    let response = xmlHttp.send()
+            if (jsonResponse.next) {
+                const morePullRequests = await getPullRequests(bitbucketOrganization, repositorySlug, accessToken, page + 1)
+                pullRequests.concat(morePullRequests)
+            }
 
-    if (response.status === 200) {
-        let jsonResponse = JSON.parse(response.responseText)
+            return pullRequests
+        })
+        .catch(function (err) {
+            console.error('getPullRequests failed')
+            throw err;
+        })
+}
 
-        if (pullRequests === undefined) {
-            pullRequests = []
-        }
+function getPullRequest(bitbucketOrganization, repositorySlug, id, accessToken) {
+    const options = {
+        method: 'GET',
+        uri: `https://api.bitbucket.org/2.0/repositories/${bitbucketOrganization}/${repositorySlug}/pullrequests/${id}`,
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + accessToken
+        },
+        json: true
+    }
 
-        for (var i = 0, pullRequest; pullRequest = jsonResponse.values[i]; i++) {
+    return requestPromise(options)
+        .then(async function (jsonResponse) {
+            const reviewers = []
+            for (let i = 0, participant; participant = jsonResponse.participants[i]; i++) {
+                // Only REVIEWER type
+                let participantData = {
+                    role: participant.role,
+                    type: participant.type,
+                    approved: participant.approved,
+                    username: participant.user.username,
+                    userType: participant.user.type,
+                }
+
+                reviewers.push(participantData)
+            }
+
             // ??
-            let prData = {
-                id: pullRequest.id,
+            const prData = {
+                id: jsonResponse.id,
                 repositorySlug: repositorySlug,
-                title: pullRequest.title,
-                state: pullRequest.state,
-                link: pullRequest.links.html.href,
-            }
-            pullRequests.push(prData)
-        }
-
-        if (jsonResponse.next) {
-            return getPullRequests(bitbucketOrganization, repositorySlug, authToken, page + 1, pullRequests)
-        }
-
-        return pullRequests
-    }
-
-    console.error(response)
-
-    return undefined
-}
-
-function getPullRequest(bitbucketOrganization, repositorySlug, id, authToken) {
-    let xmlHttp = new XMLHttpRequest()
-
-    let url = "https://api.bitbucket.org/2.0/repositories/" + bitbucketOrganization + "/" + repositorySlug +"/pullrequests/" + id
-
-    xmlHttp.open("GET", url, false)
-    xmlHttp.setRequestHeader('Content-Type', 'application/json')
-    xmlHttp.setRequestHeader('Authorization', 'Bearer ' + authToken)
-    let response = xmlHttp.send()
-
-    if (response.status === 200) {
-        let jsonResponse = JSON.parse(response.responseText)
-
-        let reviewers = []
-        for (let i = 0, participant; participant = jsonResponse.participants[i]; i++) {
-            // Only REVIEWER
-            let participantData = {
-                role: participant.role,
-                type: participant.type,
-                approved: participant.approved,
-                username: participant.user.username,
-                userType: participant.user.type,
+                title: jsonResponse.title,
+                state: jsonResponse.state,
+                type: jsonResponse.type,
+                link: jsonResponse.links.html.href,
+                reviewers: reviewers
             }
 
-            reviewers.push(participantData)
-        }
-
-        // ??
-        let prData = {
-            id: jsonResponse.id,
-            repositorySlug: repositorySlug,
-            title: jsonResponse.title,
-            state: jsonResponse.state,
-            type: jsonResponse.type,
-            link: jsonResponse.links.html.href,
-            reviewers: reviewers
-        }
-
-        return prData
-    }
-
-    console.error(response)
-
-    return undefined
+            return prData
+        })
+        .catch(function (err) {
+            console.error('getPullRequest failed')
+            throw err;
+        })
 }
 
 function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
-    let xmlHttp = new XMLHttpRequest()
-
-    let url = "https://" + jiraOrganization + ".atlassian.net/rest/api/latest/issue/" + ticketId
-
-    xmlHttp.open("GET", url, false)
-    xmlHttp.setRequestHeader('Content-Type', 'application/json')
-    xmlHttp.setRequestHeader('Authorization', 'Basic ' + Base64.encode(jiraUsername + ":" + jiraToken))
-    let response = xmlHttp.send()
-
-    if (response.status === 200) {
-        let jsonResponse = JSON.parse(response.responseText)
-
-        // Only "IN PROGRESS" and by team?
-        let ticketData = {
-            team: jsonResponse.fields.customfield_10900,
-            status: jsonResponse.fields.status.name,
-        }
-
-        return ticketData
+    const options = {
+        method: 'GET',
+        uri: `https://${jiraOrganization}.atlassian.net/rest/api/latest/issue/${ticketId}`,
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + Base64.encode(jiraUsername + ":" + jiraToken)
+        },
+        json: true
     }
 
-    console.error(response)
+    return requestPromise(options)
+        .then(async function (jsonResponse) {
+            // Only "IN PROGRESS" and by team?
+            const ticketData = {
+                team: jsonResponse.fields.customfield_10900,
+                status: jsonResponse.fields.status.name,
+            }
 
-    return undefined
+            return ticketData
+        })
+        .catch(function (err) {
+            console.error('getTicket failed')
+            throw err;
+        })
 }
 
 function success(bot, message, userMapping, pullRequests) {
@@ -324,26 +326,26 @@ function success(bot, message, userMapping, pullRequests) {
 
 function formatPullRequest(pullRequest, userMapping) {
     // ${pullRequest.critical ? ':rotating_light:' : ''}
-    return `\`${pullRequest.title}\` ${pullRequest.reviewers ? pullRequest.reviewers.map(r => formatReviewers(r, userMapping) ).join(' ') : ''} - ${formatUrl(pullRequest.link)}`
+    return `\`${pullRequest.title}\` ${pullRequest.reviewers ? pullRequest.reviewers.map(r => formatReviewers(r, userMapping)).join(' ') : ''} - ${formatUrl(pullRequest.link)}`
 }
 
-function formatReviewers(reviewer, userMapping){
+function formatReviewers(reviewer, userMapping) {
     const bitbucketUsername = reviewer.username
     const slackUsername = userMapping[bitbucketUsername]
-    return slackUsername === undefined ? '*' + bitbucketUsername + '*' : '<@' + slackUsername + '>'
+    return slackUsername === undefined ? `*${bitbucketUsername}*` : `<@${slackUsername}>`
 }
 
-function getRandomMessage(messages){
+function getRandomMessage(messages) {
     return messages[Math.floor(Math.random() * messages.length)]
 }
 
-function formatUrl(html_url){
+function formatUrl(html_url) {
     const regexp = new RegExp(`\\/([^\\/]+)\\/pull\\/(\\d+)$`)
 
     const matched = html_url.match(regexp)
 
     if (matched) {
-        return '<' + html_url + '|' + matched[1] + ' #' + matched[2] + '>'
+        return `<${html_url}|${matched[1]} #${matched[2]}>`
     }
 
     return html_url
