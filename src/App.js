@@ -192,7 +192,6 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
         .then(async function (jsonResponse) {
             let repositories = []
             for (var i = 0, repository; repository = jsonResponse.values[i]; i++) {
-                // Get the repositories that are marked as services?
                 let repoData = {
                     uuid: repository.uuid,
                     slug: repository.slug,
@@ -238,7 +237,6 @@ function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, pag
         .then(async function (jsonResponse) {
             let pullRequests = []
             for (var i = 0, pullRequest; pullRequest = jsonResponse.values[i]; i++) {
-                // ??
                 let prData = {
                     id: pullRequest.id,
                     repositorySlug: repositorySlug,
@@ -281,7 +279,6 @@ function getPullRequest(bitbucketOrganization, repositorySlug, id, accessToken) 
         .then(async function (jsonResponse) {
             const reviewers = []
             for (let i = 0, participant; participant = jsonResponse.participants[i]; i++) {
-                // Only REVIEWER type
                 let participantData = {
                     role: participant.role,
                     type: participant.type,
@@ -293,7 +290,6 @@ function getPullRequest(bitbucketOrganization, repositorySlug, id, accessToken) 
                 reviewers.push(participantData)
             }
 
-            // ??
             const prData = {
                 id: jsonResponse.id,
                 repositorySlug: repositorySlug,
@@ -328,7 +324,6 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
 
     return requestPromise(options)
         .then(async function (jsonResponse) {
-            // Only "IN PROGRESS" and by team?
             const ticketData = {
                 team: jsonResponse.fields.customfield_10900.value,
                 status: jsonResponse.fields.status.name,
@@ -344,7 +339,7 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
 
 function filterPullRequest(pullRequest) {
     if (pullRequest.reviewers.filter(filterReviewer).length === 0) {
-        console.log(`No valid reviewers found id:${pullRequest.repositorySlug}/${pullRequest.id}`)
+        console.log(`No missing reviewers found id:${pullRequest.repositorySlug}/${pullRequest.id}`)
         console.log(pullRequest.reviewers)
         return false
     }
@@ -358,7 +353,7 @@ function filterPullRequest(pullRequest) {
 }
 
 function filterReviewer(reviewer) {
-    return reviewer.approved && reviewer.type === 'REVIEWER'
+    return reviewer.approved === false && reviewer.role === 'REVIEWER'
 }
 
 function success(bot, message, userMapping, pullRequests) {
