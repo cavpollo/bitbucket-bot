@@ -92,7 +92,7 @@ class App {
             for (let i = 0, repository; repository = repositories[i]; i++) {
                 const pullRequestsData = await getPullRequests(bitbucketOrganization, repository.slug, accessToken)
 
-                simplePullRequests.push(pullRequestsData)
+                simplePullRequests.concat(pullRequestsData)
             }
 
             console.log(simplePullRequests)
@@ -101,7 +101,7 @@ class App {
             for (let i = 0, pullRequest; pullRequest = simplePullRequests[i]; i++) {
                 const pullRequestData = await getPullRequest(bitbucketOrganization, pullRequest.repositorySlug, pullRequest.id, accessToken)
 
-                fullPullRequests.push(pullRequestData)
+                fullPullRequests.concat(pullRequestData)
             }
 
             console.log(fullPullRequests)
@@ -157,7 +157,7 @@ function authenticateBitbucket(bitbucketUsername, bitbucketToken) {
 }
 
 function getRepositories(bitbucketOrganization, accessToken, page = 1) {
-    console.log('start getRepositories')
+    console.log('start getRepositories page:' + page)
 
     const options = {
         method: 'GET',
@@ -191,22 +191,19 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
             if (jsonResponse.next) {
                 const moreRepositories = await getRepositories(bitbucketOrganization, accessToken, page + 1)
 
-                console.log('moreRepositories:')
-                console.log(moreRepositories)
-
                 repositories.concat(moreRepositories)
             }
 
             return repositories
         })
         .catch(function (err) {
-            console.error('getRepositories failed')
+            console.error(`getRepositories page:${page} failed`)
             throw err;
         })
 }
 
 function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, page = 1) {
-    console.log('start getPullRequests')
+    console.log('start getPullRequests page:' + page)
 
     const options = {
         method: 'GET',
@@ -238,15 +235,19 @@ function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, pag
                 pullRequests.push(prData)
             }
 
+            console.log('pullRequests page:' + page)
+            console.log(pullRequests)
+
             if (jsonResponse.next) {
                 const morePullRequests = await getPullRequests(bitbucketOrganization, repositorySlug, accessToken, page + 1)
+
                 pullRequests.concat(morePullRequests)
             }
 
             return pullRequests
         })
         .catch(function (err) {
-            console.error('getPullRequests failed')
+            console.error('getPullRequests page:${page} failed`)
             throw err;
         })
 }
