@@ -112,9 +112,14 @@ class App {
             for (let i = 0, pullRequest; pullRequest = simplePullRequests[i]; i++) {
                 const ticketId = /DEV-\d+/.exec(pullRequest.title)
                 // if ticket id present
-                const ticketData = await getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId)
 
-                fullPullRequests.ticket = ticketData
+                if (ticketId) {
+                    const ticketData = await getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId)
+
+                    fullPullRequests.ticket = ticketData
+                } else {
+                    console.error(`PR ${pullRequest.repositorySlug}/${pullRequest.id} has no ticket in title ${pullRequest.title}`)
+                }
             }
 
             console.log('updated fullPullRequests')
@@ -239,9 +244,6 @@ function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, pag
                 pullRequests.push(prData)
             }
 
-            console.log(`getPullRequests repo:${repositorySlug} page:${page}`)
-            console.log(pullRequests)
-
             if (jsonResponse.next) {
                 const morePullRequests = await getPullRequests(bitbucketOrganization, repositorySlug, accessToken, page + 1)
 
@@ -306,7 +308,7 @@ function getPullRequest(bitbucketOrganization, repositorySlug, id, accessToken) 
 }
 
 function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
-    console.log('start getTicket')
+    console.log('start getTicket id:' + ticketId)
 
     const options = {
         method: 'GET',
@@ -330,7 +332,7 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
             return ticketData
         })
         .catch(function (err) {
-            console.error('getTicket failed')
+            console.error(`getTicket id:${ticketId} failed`)
             throw err
         })
 }
