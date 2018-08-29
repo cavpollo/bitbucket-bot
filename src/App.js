@@ -89,21 +89,21 @@ class App {
             console.log('repositories')
             console.log(repositories)
 
-            const simplePullRequests = []
+            let simplePullRequests = []
             for (let i = 0, repository; repository = repositories[i]; i++) {
                 const pullRequestsData = await getPullRequests(bitbucketOrganization, repository.slug, accessToken)
 
-                simplePullRequests.concat(pullRequestsData)
+                simplePullRequests = simplePullRequests.concat(pullRequestsData)
             }
 
             console.log('simplePullRequests')
             console.log(simplePullRequests)
 
-            const fullPullRequests = []
+            let fullPullRequests = []
             for (let i = 0, pullRequest; pullRequest = simplePullRequests[i]; i++) {
                 const pullRequestData = await getPullRequest(bitbucketOrganization, pullRequest.repositorySlug, pullRequest.id, accessToken)
 
-                fullPullRequests.concat(pullRequestData)
+                fullPullRequests = fullPullRequests.concat(pullRequestData)
             }
 
             console.log('fullPullRequests')
@@ -180,7 +180,7 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
 
     return requestPromise(options)
         .then(async function (jsonResponse) {
-            const repositories = []
+            let repositories = []
             for (var i = 0, repository; repository = jsonResponse.values[i]; i++) {
                 // Get the repositories that are marked as services?
                 let repoData = {
@@ -195,12 +195,8 @@ function getRepositories(bitbucketOrganization, accessToken, page = 1) {
             if (jsonResponse.next) {
                 const moreRepositories = await getRepositories(bitbucketOrganization, accessToken, page + 1)
 
-                console.log(`concat getRepositories page:${page} expected-item-count:${repositories.length}+${moreRepositories.length}`)
-
-                repositories.concat(moreRepositories)
+                repositories = repositories.concat(moreRepositories)
             }
-
-            console.log(`return getRepositories page:${page} item-count:${repositories.length}`)
 
             return repositories
         })
@@ -230,7 +226,7 @@ function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, pag
 
     return requestPromise(options)
         .then(async function (jsonResponse) {
-            const pullRequests = []
+            let pullRequests = []
             for (var i = 0, pullRequest; pullRequest = jsonResponse.values[i]; i++) {
                 // ??
                 let prData = {
@@ -249,7 +245,7 @@ function getPullRequests(bitbucketOrganization, repositorySlug, accessToken, pag
             if (jsonResponse.next) {
                 const morePullRequests = await getPullRequests(bitbucketOrganization, repositorySlug, accessToken, page + 1)
 
-                pullRequests.concat(morePullRequests)
+                pullRequests = pullRequests.concat(morePullRequests)
             }
 
             return pullRequests
