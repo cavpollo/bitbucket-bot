@@ -1736,6 +1736,13 @@ hawk@~6.0.2:
     hoek "4.x.x"
     sntp "2.x.x"
 
+heroku-client@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/heroku-client/-/heroku-client-3.0.6.tgz#bf603716a9d469682d4f7f80489276d82b896305"
+  dependencies:
+    is-retry-allowed "^1.0.0"
+    tunnel-agent "^0.6.0"
+
 hoek@2.x.x:
   version "2.16.3"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-2.16.3.tgz#20bb7403d3cea398e91dc4710a8ff1b8274a25ed"
@@ -1977,6 +1984,10 @@ is-property@^1.0.0:
 is-resolvable@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/is-resolvable/-/is-resolvable-1.0.1.tgz#acca1cd36dbe44b974b924321555a70ba03b1cf4"
+
+is-retry-allowed@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/is-retry-allowed/-/is-retry-allowed-1.1.0.tgz#11a060568b67339444033d0125a61a20d564fb34"
 
 is-typedarray@~1.0.0:
   version "1.0.0"

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "botkit": "^0.5.5",
+    "heroku-client": "^3.0.6",
     "request": "^2.88.0",
     "request-promise": "^4.2.2"
   },
