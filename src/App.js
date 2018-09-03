@@ -316,7 +316,7 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
     return requestPromise(options)
         .then(async function (jsonResponse) {
             const ticketData = {
-                team: jsonResponse.fields.customfield_10900.value,
+                team: jsonResponse.fields.customfield_10900 ? jsonResponse.fields.customfield_10900.value : 'NOTEAM',
                 status: jsonResponse.fields.status.name,
             }
 
