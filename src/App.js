@@ -315,8 +315,14 @@ function getTicket(jiraUsername, jiraToken, jiraOrganization, ticketId) {
 
     return requestPromise(options)
         .then(async function (jsonResponse) {
+            let team
+            if (jsonResponse.fields.customfield_10900 !== undefined) {
+                team = jsonResponse.fields.customfield_10900.value
+            } else {
+                team = 'NOTEAM'
+            }
             const ticketData = {
-                team: jsonResponse.fields.customfield_10900 !== undefined ? jsonResponse.fields.customfield_10900.value : 'NOTEAM',
+                team: team,
                 status: jsonResponse.fields.status.name,
             }
 
